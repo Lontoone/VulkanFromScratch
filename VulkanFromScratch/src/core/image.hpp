@@ -6,7 +6,7 @@
 
 class  Image
 {
-	
+	friend class Renderer;
 public:
 	Image(CoreInstance& core_instance);
 	~Image() ;

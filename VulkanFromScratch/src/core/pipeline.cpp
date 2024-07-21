@@ -235,6 +235,7 @@ void GraphicsPipeline::create_pipleine(
 	//pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 	//pipelineLayoutInfo.setLayoutCount = 1;//static_cast<uint32_t>( descriptors.size()); // Optional
 	//pipelineLayoutInfo.pSetLayouts = &descriptors; // Optional
+	
 	pipelineLayoutInfo.setLayoutCount = descriptors->size();
 	pipelineLayoutInfo.pSetLayouts = descriptors->data();
 

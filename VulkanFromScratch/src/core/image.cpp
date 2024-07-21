@@ -306,7 +306,7 @@ void Image::createDescriptorSetLayout()
     VkDescriptorSetLayoutCreateInfo layoutInfo{};
     layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-    layoutInfo.pBindings = bindings.data();
+    layoutInfo.pBindings = bindings.data();    
 
     if (vkCreateDescriptorSetLayout(
         m_core_instance.get_device()
