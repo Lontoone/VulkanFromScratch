@@ -37,6 +37,16 @@ void Model::draw(const VkCommandBuffer& cmdBuf)
 
 void Model::create_vertexBuffer()
 {
+	uint32_t buffer_size = sizeof(vertices[0]) * vertices.size();
+	createBuffer(
+		m_core_instance.get_device(),
+		m_core_instance.get_physical_device(),
+		buffer_size,
+		VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		m_vertexBuffer,
+		m_vertexBufferMemory);
+	/*
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size = sizeof(vertices[0]) * vertices.size();
@@ -66,29 +76,29 @@ void Model::create_vertexBuffer()
 		}
 		vkBindBufferMemory(m_core_instance.get_device(), m_vertexBuffer, m_vertexBufferMemory, 0);
 	}
-
+	*/
 	//----------------
 	//		Dtat mapping
 	//----------------
 	{
 		void* data; // pointer to the mapped memory
-		vkMapMemory(m_core_instance.get_device(), m_vertexBufferMemory, 0, bufferInfo.size, 0, &data);
+		vkMapMemory(m_core_instance.get_device(), m_vertexBufferMemory, 0, buffer_size, 0, &data);
 		// The driver may not immediately copy the data into the buffer memory, for example because of caching. 
 		// It is also possible that writes to the buffer are not visible in the mapped memory yet. There are two
 		// ways to deal with that problem:
 		//		* Use a memory heap that is host coherent, indicated with VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 		//		* Call vkFlushMappedMemoryRanges after writing to the mapped memory, and call vkInvalidateMappedMemoryRanges 
 		//		  before reading from the mapped memory
-		memcpy(data, vertices.data(), (size_t)bufferInfo.size);
+		//memcpy(data, vertices.data(), (size_t)bufferInfo.size);
+		memcpy(data, vertices.data(), buffer_size);
 		vkUnmapMemory(m_core_instance.get_device(), m_vertexBufferMemory);
 
-		/*
-		Flushing memory ranges or using a coherent memory heap means that the driver will be aware of our writes to the buffer,
-		but it doesn't mean that they are actually visible on the GPU yet. The transfer of data to the GPU is an operation that
-		happens in the background and the specification simply tells us that it is guaranteed to be complete as of the next call
-		to vkQueueSubmit.
-		*/
+		// Flushing memory ranges or using a coherent memory heap means that the driver will be aware of our writes to the buffer,
+		// but it doesn't mean that they are actually visible on the GPU yet. The transfer of data to the GPU is an operation that
+		// happens in the background and the specification simply tells us that it is guaranteed to be complete as of the next call
+		// to vkQueueSubmit.
 	}
+
 }
 
 void Model::create_indexBuffer()

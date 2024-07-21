@@ -3,6 +3,8 @@
 Renderer::Renderer(CoreInstance& core_instance, SwapChain& swapchain) :m_core_instance{ core_instance }, m_swapchain{swapchain}
 {
     create_renderPass();
+    create_frameBuffer(m_swapchain , m_renderpass);
+    create_commandBuffer();
 }
 
 Renderer::~Renderer()
@@ -45,8 +47,6 @@ void Renderer::create_frameBuffer(SwapChain& swapchain, VkRenderPass renderPass 
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
-
-
 }
 /*
 void Renderer::create_commnadPool()
@@ -163,14 +163,8 @@ void Renderer::begin_commandBuffer()
     scissor.extent = VkExtent2D{ m_swapchain._width() ,m_swapchain._height() };
     vkCmdSetScissor(m_commandBuffers[current_frame], 0, 1, &scissor);
 
-    /*
-    vkCmdDraw(m_commandBuffers[current_frame], 3, 1, 0, 0);
 
-    vkCmdEndRenderPass(m_commandBuffers[current_frame]);
-    if (vkEndCommandBuffer(m_commandBuffers[current_frame]) != VK_SUCCESS) {
-        throw std::runtime_error("failed to record command buffer!");
-    }
-    */
+    // You can draw now....
 }
 
 // If your fragment shader have multiple output target, modify this!!!

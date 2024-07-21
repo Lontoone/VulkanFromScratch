@@ -28,8 +28,8 @@ public :
 	void draw_frame();
 	void begin_commandBuffer();
 	void reset_renderpass();
-	void end_render();
 	void bind(VkCommandBuffer& cmdBuf , VkPipelineLayout& pipeline_layout);
+	void end_render();
 	
 	inline const auto get_renderPass()const { return m_renderpass; } // Todo : split to small class
 	inline VkCommandBuffer& get_current_cmdbuffer() { return m_commandBuffers[m_swapchain.current_frame()]; }

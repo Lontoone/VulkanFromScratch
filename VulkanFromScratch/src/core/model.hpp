@@ -1,10 +1,13 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
-#include <glm.hpp>
+#include "core/core_fwd.h"
 #include <vector>
 #include <array>
+#include <glm.hpp>
+/*
+#include <vulkan/vulkan.h>
 #include <core/core_instance.hpp>
+*/
 class Model {
 
 public:

@@ -24,8 +24,8 @@ int main() {
 		gameobject.get_all_descriptorLayouts()
 	);
 	Model model{coreInstance , pipeline.get_pipeline()};
-	renderer.create_frameBuffer(swapchain, renderer.get_renderPass());	
-	renderer.create_commandBuffer();	
+	//renderer.create_frameBuffer(swapchain, renderer.get_renderPass());	
+	//renderer.create_commandBuffer();	
 
 
 	while (main_window.is_window_alive())
