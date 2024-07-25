@@ -393,4 +393,9 @@ VkDescriptorSetLayout Renderer::get_descriptorset_layout()
     return m_texture_image->get_descriptorsetLayout();
 }
 
+void Renderer::update(FrameUpdateData& updateData)
+{
+    bind(updateData.m_cmdbuffer , updateData.m_pipeline_layout);
+}
+
 

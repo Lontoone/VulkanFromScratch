@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <stdexcept>
+#include "sturcture_h.h"
 
 class TransformObject: public Component {
 public:
@@ -21,11 +22,13 @@ public:
         glm::mat4 proj;
     };
 
+
     void updateUniformBuffer(uint32_t currentImage);
     void bind(VkCommandBuffer& cmdbuffer, unsigned int currentFrame , VkPipelineLayout& pipeline_layout);
 
     VkDescriptorSetLayout      m_descriptorSetLayout;
     VkDescriptorSetLayout      get_descriptorset_layout() override;
+    void                       update(FrameUpdateData& updateData) override;
 private:
     void cleanup();
 

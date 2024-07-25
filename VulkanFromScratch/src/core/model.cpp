@@ -17,6 +17,12 @@ Model::~Model()
 
 }
 
+void Model::update(FrameUpdateData& update_data)
+{
+	bind(update_data.m_cmdbuffer);
+	draw(update_data.m_cmdbuffer);
+}
+
 
 void Model::bind(const VkCommandBuffer& cmdBuf )
 {

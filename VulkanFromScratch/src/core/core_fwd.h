@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <vulkan/vulkan.h>
+#include "./core/sturcture_h.h"
 
 #include "./core/component.hpp"
 #include "./core/gameobject.hpp"

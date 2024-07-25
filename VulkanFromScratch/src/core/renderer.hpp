@@ -11,7 +11,8 @@ public :
 	//------------------
 	//	Component class
 	//------------------
-	VkDescriptorSetLayout      get_descriptorset_layout() override;
+	VkDescriptorSetLayout		get_descriptorset_layout() override;
+	void						update(FrameUpdateData& updateData) override;
 	
 	//------------------
 	//	Additional Property

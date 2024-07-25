@@ -152,6 +152,7 @@
     <ClInclude Include="src\core\model.hpp" />
     <ClInclude Include="src\core\pipeline.hpp" />
     <ClInclude Include="src\core\renderer.hpp" />
+    <ClInclude Include="src\core\sturcture_h.h" />
     <ClInclude Include="src\core\swapchain.hpp" />
     <ClInclude Include="src\core\transformObject.hpp" />
     <ClInclude Include="src\core\window.hpp" />

@@ -8,11 +8,16 @@
 #include <vulkan/vulkan.h>
 #include <core/core_instance.hpp>
 */
-class Model {
+class Model : public Component{
 
 public:
     Model(CoreInstance& _core , VkPipeline pipeline);
     ~Model();
+    //-----------------
+    //  Component class 
+    //-----------------
+    void            update(FrameUpdateData& update_data) override;
+
     //-----------------
     //  Temp data
     //-----------------

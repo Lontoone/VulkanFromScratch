@@ -21,6 +21,12 @@ VkDescriptorSetLayout TransformObject::get_descriptorset_layout()
     return m_descriptorSetLayout;
 }
 
+void TransformObject::update(FrameUpdateData& updateData)
+{
+    updateUniformBuffer(updateData.m_image_idx);
+    bind(updateData.m_cmdbuffer , updateData.m_image_idx , updateData.m_pipeline_layout);
+}
+
 void TransformObject::cleanup()
 {
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
@@ -157,6 +163,7 @@ void TransformObject::createDescriptorSets()
     allocInfo.descriptorPool = m_descriptorPool;
     allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
     allocInfo.pSetLayouts = layouts.data();
+    
 
     // You don't need to explicitly clean up descriptor sets, because 
     // they will be automatically freed when the descriptor pool is destroyed.
@@ -203,9 +210,10 @@ void TransformObject::createDescriptorSets()
 void TransformObject::bind(VkCommandBuffer& cmdbuffer , unsigned int currentFrame , VkPipelineLayout& pipeline_layout)
 {
     vkCmdBindDescriptorSets(cmdbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        pipeline_layout,   //Where to bind
-        0,  // index of the first descriptor set,
-        1,  // the number of sets to bind
+        pipeline_layout,        //Where to bind
+        TRANSFORM_UNIFORM_SET,  // index of the first descriptor set,
+        1,                      // the number of sets to bind
         &m_descriptorSets[currentFrame], //array of set to bind
-        0, nullptr);
+        0,
+        nullptr);
 }
