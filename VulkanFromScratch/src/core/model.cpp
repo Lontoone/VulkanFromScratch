@@ -19,8 +19,8 @@ Model::~Model()
 
 void Model::update(FrameUpdateData& update_data)
 {
-	bind(update_data.m_cmdbuffer);
-	draw(update_data.m_cmdbuffer);
+	this->bind(update_data.m_cmdbuffer);
+	this->draw(update_data.m_cmdbuffer);
 }
 
 

@@ -1,6 +1,8 @@
 #include "swapchain.hpp"
 #include <stdexcept>
 #include <iostream>
+//#include "core_fwd.h"
+
 
 SwapChain::SwapChain(CoreInstance& core_instance, const unsigned int w, const unsigned int h) : 
 	m_core_instance{ core_instance },m_width{ w }, m_height{h}
@@ -17,6 +19,7 @@ SwapChain::SwapChain(CoreInstance& core_instance, const unsigned int w, const un
 	create_images();
 	create_image_view(); 
 	create_syncobjects();
+	create_depth_buffer();
 
 }
 
@@ -175,6 +178,7 @@ VkExtent2D SwapChain::choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabil
 		return actualExtent;
 }
 
+// ToDo: Use helper functions
 void SwapChain::create_image_view()
 {
 	// An image view is quite literally a view into an image.
@@ -259,4 +263,18 @@ void SwapChain::create_syncobjects()
 			throw std::runtime_error("failed to create semaphores!");
 		}
 	}
+}
+
+void SwapChain::create_depth_buffer()
+{
+	auto depth_format = findDepthFormat(m_core_instance.get_physical_device());
+	
+	bool has_stencil = hasStencilComponent(depth_format);
+
+	createImage(m_core_instance.get_device() , m_core_instance.get_physical_device(),
+		m_width, m_height, depth_format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
+	depthImageView = createImageView(m_core_instance.get_device(), depthImage, depth_format , VK_IMAGE_ASPECT_DEPTH_BIT);
+	
+	//transitionImageLayout(m_core_instance, depthImage, depth_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+
 }

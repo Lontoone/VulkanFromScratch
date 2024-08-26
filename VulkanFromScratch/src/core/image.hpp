@@ -1,6 +1,7 @@
 #pragma once
 
-#include "core/core_fwd.h"
+//#include "core/core_fwd.h"
+#include "helper/helper_functions.hpp"
 #include "core/core_instance.hpp"
 
 

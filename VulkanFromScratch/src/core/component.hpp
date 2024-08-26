@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 #include <vulkan/vulkan.h>
+#include "core/sturcture_h.h"
 //#include "./core/core_fwd.h"
 class Component
 {

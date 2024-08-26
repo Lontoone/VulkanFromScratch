@@ -1,7 +1,13 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <vector>
-#include "core/core_fwd.h"
+//#include "core/core_fwd.h"
+
+#include "sturcture_h.h"
+#include "core_instance.hpp"
+#include "core/component.hpp"
+#include "core/swapchain.hpp"
+#include "core/image.hpp"
 class Renderer : public Component{
 	friend class Image;
 public :

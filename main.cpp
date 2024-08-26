@@ -1,6 +1,15 @@
 #pragma once
-#include "core/core_fwd.h"
-#include "helper/storage.hpp"
+//#include "core/core_fwd.h"
+//#include "helper/storage.hpp"
+#include "./core/component.hpp"
+#include "./core/gameobject.hpp"
+#include "./core/window.hpp"
+#include "./core/swapchain.hpp"
+#include "./core/pipeline.hpp"
+#include "./core/renderer.hpp"
+#include "./core/model.hpp"
+#include "./core/image.hpp"
+#include "./core/transformObject.hpp"
 int main() {
 
 	DisplayWindow main_window {};

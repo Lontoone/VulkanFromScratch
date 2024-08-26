@@ -1,6 +1,9 @@
 #pragma once
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <vulkan/vulkan_core.h>
 #include <vector>
+#include <helper/helper_functions.hpp>
 #include "./core/core_instance.hpp"
 #include <cstdint> // Necessary for uint32_t
 #include <limits> // Necessary for std::numeric_limits
@@ -30,6 +33,7 @@ public :
     inline VkFence& get_fence() { return m_inFlightFences[m_currentFrame]; }  // todo: auto fence pool
     inline const VkSemaphore get_avaliable_semaphore(){ return m_imageAvailableSemaphores[m_currentFrame]; }  // todo: auto fence pool
     inline const VkSemaphore get_finish_semaphore() { return m_renderFinishedSemaphores[m_currentFrame]; }  // todo: auto fence pool
+    inline const VkImageView& get_depth_img_view() const { return depthImageView; }
 
     //VkSemaphore m_imageAvailableSemaphore;
     //VkSemaphore m_renderFinishedSemaphore;
@@ -55,6 +59,10 @@ private:
     VkExtent2D                  m_swapChain_extent;
     std::vector<VkImageView>    m_swapChain_image_views;
 
+    VkImage depthImage;
+    VkDeviceMemory depthImageMemory;
+    VkImageView depthImageView;
+
     
 
     void query_support();
@@ -62,6 +70,7 @@ private:
     void create_image_view();
     void clean();
     void create_syncobjects();
+    void create_depth_buffer();
     VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR choose_swap_present_mode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabilities, const unsigned int w, const unsigned int h);

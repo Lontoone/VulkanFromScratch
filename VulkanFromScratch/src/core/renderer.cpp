@@ -1,4 +1,5 @@
 #include "renderer.hpp"
+#include <stdexcept>
 
 Renderer::Renderer(CoreInstance& core_instance, SwapChain& swapchain) :m_core_instance{ core_instance }, m_swapchain{swapchain}
 {
@@ -31,13 +32,14 @@ void Renderer::create_frameBuffer(SwapChain& swapchain, VkRenderPass renderPass 
 
     for (size_t i = 0; i < swapchain.get_image_views().size(); i++) {
         VkImageView attachments[] = {
-            swapchain.get_image_views()[i]
+            swapchain.get_image_views()[i] , 
+            swapchain.get_depth_img_view()
         };
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         framebufferInfo.renderPass = renderPass;
-        framebufferInfo.attachmentCount = 1;
+        framebufferInfo.attachmentCount = 2;  //attachments.size
         framebufferInfo.pAttachments = attachments;
         framebufferInfo.width = swapchain._width();
         framebufferInfo.height = swapchain._height();
@@ -129,9 +131,14 @@ void Renderer::begin_commandBuffer()
     renderPassInfo.renderArea.extent = VkExtent2D{m_swapchain._width() , m_swapchain._height() };
     
     // Define clear color
-    VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
-    renderPassInfo.clearValueCount = 1;
-    renderPassInfo.pClearValues = &clearColor;
+    std::vector<VkClearValue>clearColor{ VkClearValue(), VkClearValue ()};
+    clearColor[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+    clearColor[1].depthStencil = { 1.0f, 0 };
+
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearColor.size());;
+    renderPassInfo.pClearValues = clearColor.data();
+    
+
 
     /*
         * VK_SUBPASS_CONTENTS_INLINE: The render pass commands will be embedded in the primary command buffer itself and no secondary command buffers will be executed.
@@ -227,12 +234,32 @@ void Renderer::create_renderPass()
     colorAttachmentRef.attachment = 0; // Our array consists of a single VkAttachmentDescription, so its index is 0.
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
+    //--------------------------
+   //      Depth
+   //--------------------------
+    VkAttachmentDescription depthAttachment{};
+    depthAttachment.format = findDepthFormat(m_core_instance.get_physical_device()); // The format should be the same as the depth image itself.
+    depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE; // it will not be used after drawing has finished.
+    depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; //we don't care about the previous depth contents
+    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    VkAttachmentReference depthAttachmentRef{};
+    depthAttachmentRef.attachment = 1;
+    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+
+
     VkSubpassDescription subpass{};
     // The index of the attachment in this array is directly referenced from the fragment shader with the 
     // layout(location = 0) out vec4 outColor directive!
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &colorAttachmentRef;
+    subpass.pDepthStencilAttachment = &depthAttachmentRef;
    
     // Subpasses in a render pass automatically take care of image layout transitions. 
     // These transitions are controlled by subpass dependencies, which specify memory 
@@ -251,19 +278,27 @@ void Renderer::create_renderPass()
     // specify the operations to wait on and the stages in which these operations occur. 
     // We need to wait for the swap chain to finish reading from the image before we can access it.
     // This can be accomplished by waiting on the color attachment output stage itself.
+    /*
     dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT; //specifies the pipeline stage that produces the data.
-    dependency.srcAccessMask = 0; // 0 means the dependency is not waiting for any specific memory access to complete.
 
     dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;// indicating that the subsequent operations will also involve writing to color attachments.
     dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT; // indicates that the destination stage will involve writing to color attachments.
+    */
+    dependency.srcAccessMask = 0; // 0 means the dependency is not waiting for any specific memory access to complete.
+    // Add VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT to perform depth test
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
+   
     //--------------------------
     //      Render Pass
     //--------------------------    
+    std::vector<VkAttachmentDescription> attachments{ colorAttachment, depthAttachment };
     VkRenderPassCreateInfo renderpassinfo{};
     renderpassinfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderpassinfo.attachmentCount = 1;
-    renderpassinfo.pAttachments = &colorAttachment;
+    renderpassinfo.attachmentCount = static_cast<uint32_t>(attachments.size());;
+    renderpassinfo.pAttachments = attachments.data();
     renderpassinfo.subpassCount = 1;
     renderpassinfo.pSubpasses = &subpass;
 
@@ -395,7 +430,7 @@ VkDescriptorSetLayout Renderer::get_descriptorset_layout()
 
 void Renderer::update(FrameUpdateData& updateData)
 {
-    bind(updateData.m_cmdbuffer , updateData.m_pipeline_layout);
+    this->bind(updateData.m_cmdbuffer , updateData.m_pipeline_layout);
 }
 
 

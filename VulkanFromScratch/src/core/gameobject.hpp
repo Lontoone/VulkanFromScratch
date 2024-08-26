@@ -1,8 +1,9 @@
 #pragma once
-#include "core/core_fwd.h"
-//#include "core/component.hpp"
+//#include "core/core_fwd.h"
+#include "core/component.hpp"
 #include <vector>
 #include <vulkan/vulkan.h>
+#include "sturcture_h.h"
 class GameObject
 {
 public:
